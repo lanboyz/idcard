@@ -1,5 +1,5 @@
 {
-  "name": "ID Card Mahasiswa Generator",
-  "description": "An application to generate a professional-looking student ID card with customizable details and images. Users can input their information and upload a logo, photo, stamp, and signature to create a realistic ID card design.",
+  "name": "Generator Kartu Tanda Mahasiswa UNNES",
+  "description": "Aplikasi untuk membuat desain Kartu Tanda Mahasiswa (KTM) Universitas Negeri Semarang. Unggah logo, foto, stempel, dan tanda tangan untuk menghasilkan empat desain kartu yang realistis dan profesional.",
   "requestFramePermissions": []
 }

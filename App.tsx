@@ -1,269 +1,216 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { StudentData } from './types';
-import FormField from './components/FormField';
-import ImageUpload from './components/ImageUpload';
-import IdCardPreview from './components/IdCardPreview';
-import Template1 from './components/templates/Template1';
-import Template4 from './components/templates/Template4';
+import CardTemplate from './components/CardTemplate';
 
-const MAJORS_LIST = [
-  'Agribisnis',
-  'Agroteknologi',
-  'Akuntansi',
-  'Antropologi Sosial',
-  'Arsitektur',
-  'Astronomi',
-  'Bimbingan dan Konseling',
-  'Biologi',
-  'Bisnis Digital',
-  'Desain Interior',
-  'Desain Komunikasi Visual (DKV)',
-  'Ekonomi Pembangunan',
-  'Farmasi',
-  'Filsafat',
-  'Fisika',
-  'Fisioterapi',
-  'Fotografi',
-  'Geofisika',
-  'Gizi',
-  'Hubungan Internasional',
-  'Ilmu Ekonomi',
-  'Ilmu Hukum',
-  'Ilmu Keperawatan',
-  'Ilmu Kesejahteraan Sosial',
-  'Ilmu Komputer',
-  'Ilmu Komunikasi',
-  'Ilmu Politik',
-  'Ilmu Tanah',
-  'Kebidanan',
-  'Kehutanan',
-  'Kesehatan Masyarakat',
-  'Kewirausahaan',
-  'Kimia',
-  'Manajemen',
-  'Matematika',
-  'Musik',
-  'Pendidikan Bahasa Inggris',
-  'Pendidikan Dokter',
-  'Pendidikan Dokter Gigi',
-  'Pendidikan Guru Sekolah Dasar (PGSD)',
-  'Pendidikan Luar Biasa',
-  'Pendidikan Matematika',
-  'Peternakan',
-  'Psikologi',
-  'Sastra Indonesia',
-  'Sastra Inggris',
-  'Sastra Jepang',
-  'Sejarah',
-  'Seni Rupa Murni',
-  'Sistem Informasi',
-  'Sosiologi',
-  'Statistika',
-  'Teknik Elektro',
-  'Teknik Industri',
-  'Teknik Informatika',
-  'Teknik Kimia',
-  'Teknik Mesin',
-  'Teknik Penerbangan',
-  'Teknik Perkapalan',
-  'Teknik Sipil',
-  'Teknologi Pangan',
-];
+const initialData: StudentData = {
+  nama: 'MUH. TAQDIR ALIWARDA',
+  nim: '5302410000', // Example NIM
+  prodi: 'Pendidikan Teknik Informatika dan Komputer',
+  masaBerlaku: '31 DES 2025',
+  tempatLahir: 'Selong',
+  tanggalLahir: '06 Juni 2001',
+  alamat1: 'Rt.14, Rw.0, Nanam, Selong',
+  alamat2: 'Kabupaten Lombok Timur',
+  golDarah: 'B',
+  phone: '081234567890',
+  email: 'm.taqdir@email.unnes.ac.id',
+  logo: null,
+  foto: null,
+  stempel: null,
+  tandaTangan: null,
+};
 
-const UNIVERSITIES_LIST = [
-  'Institut Pertanian Bogor (IPB)',
-  'Institut Teknologi Bandung (ITB)',
-  'Institut Teknologi Sepuluh Nopember (ITS)',
-  'Telkom University',
-  'Universitas Airlangga (UNAIR)',
-  'Universitas Andalas (UNAND)',
-  'Universitas Atma Jaya Yogyakarta (UAJY)',
-  'Universitas Bina Nusantara (BINUS)',
-  'Universitas Brawijaya (UB)',
-  'Universitas Ciputra',
-  'Universitas Dian Nuswantoro (UDINUS)',
-  'Universitas Diponegoro (UNDIP)',
-  'Universitas Gadjah Mada (UGM)',
-  'Universitas Gunadarma',
-  'Universitas Hasanuddin (UNHAS)',
-  'Universitas Indonesia (UI)',
-  'Universitas Islam Indonesia (UII)',
-  'Universitas Islam Negeri (UIN) Sunan Ampel Surabaya',
-  'Universitas Islam Negeri (UIN) Sunan Gunung Djati Bandung',
-  'Universitas Islam Negeri (UIN) Syarif Hidayatullah Jakarta',
-  'Universitas Jenderal Soedirman (UNSOED)',
-  'Universitas Katolik Parahyangan (UNPAR)',
-  'Universitas Komputer Indonesia (UNIKOM)',
-  'Universitas Kristen Petra',
-  'Universitas Lambung Mangkurat (ULM)',
-  'Universitas Lampung (UNILA)',
-  'Universitas Mercu Buana',
-  'Universitas Muhammadiyah Malang (UMM)',
-  'Universitas Muhammadiyah Surakarta (UMS)',
-  'Universitas Muhammadiyah Yogyakarta (UMY)',
-  'Universitas Mulawarman (UNMUL)',
-  'Universitas Negeri Jakarta (UNJ)',
-  'Universitas Negeri Makassar (UNM)',
-  'Universitas Negeri Malang (UM)',
-  'Universitas Negeri Medan (UNIMED)',
-  'Universitas Negeri Padang (UNP)',
-  'Universitas Negeri Semarang (UNNES)',
-  'Universitas Negeri Surabaya (UNESA)',
-  'Universitas Negeri Yogyakarta (UNY)',
-  'Universitas Padjadjaran (UNPAD)',
-  'Universitas Palangka Raya (UPR)',
-  'Universitas Pancasila',
-  'Universitas Pasundan (UNPAS)',
-  'Universitas Pelita Harapan (UPH)',
-  'Universitas Pendidikan Ganesha (UNDIKSHA)',
-  'Universitas Pendidikan Indonesia (UPI)',
-  'Universitas Riau (UNRI)',
-  'Universitas Sam Ratulangi (UNSRAT)',
-  'Universitas Sebelas Maret (UNS)',
-  'Universitas Sriwijaya (UNSRI)',
-  'Universitas Sumatera Utara (USU)',
-  'Universitas Syiah Kuala (UNSYIAH)',
-  'Universitas Tadulako (UNTAD)',
-  'Universitas Tanjungpura (UNTAN)',
-  'Universitas Tarumanagara (UNTAR)',
-  'Universitas Terbuka (UT)',
-  'Universitas Trisakti',
-  'Universitas Udayana (UNUD)',
-];
+const programStudiOptions = [
+  // FIP
+  "Bimbingan dan Konseling", "Pendidikan Guru Sekolah Dasar", "Pendidikan Guru PAUD", "Psikologi", "Kurikulum dan Teknologi Pendidikan", "Pendidikan Luar Sekolah",
+  // FBS
+  "Pendidikan Bahasa dan Sastra Indonesia", "Pendidikan Bahasa Inggris", "Pendidikan Bahasa Arab", "Pendidikan Bahasa Jepang", "Pendidikan Bahasa Mandarin", "Pendidikan Bahasa Prancis", "Sastra Indonesia", "Sastra Inggris", "Sastra Jawa", "Pendidikan Seni Rupa", "Pendidikan Seni Tari", "Pendidikan Seni Musik", "Desain Komunikasi Visual", "Sastra Prancis",
+  // FISIP
+  "Pendidikan Geografi", "Pendidikan Sejarah", "Pendidikan Sosiologi dan Antropologi", "Pendidikan Pancasila dan Kewarganegaraan", "Ilmu Sejarah", "Geografi", "Ilmu Politik", "Sosiologi", "Ilmu Komunikasi",
+  // FMIPA
+  "Pendidikan Matematika", "Pendidikan Fisika", "Pendidikan Kimia", "Pendidikan Biologi", "Pendidikan IPA", "Matematika", "Fisika", "Kimia", "Biologi", "Informatika", "Sistem Informasi", "Statistika", "Ilmu Lingkungan", "Farmasi", "Teknik Elektro",
+  // FT
+  "Pendidikan Teknik Bangunan", "Pendidikan Teknik Mesin", "Pendidikan Teknik Otomotif", "Pendidikan Kesejahteraan Keluarga", "Pendidikan Tata Boga", "Pendidikan Tata Busana", "Pendidikan Tata Kecantikan", "Teknik Mesin", "Teknik Sipil", "Teknik Kimia", "Teknik Arsitektur", "Teknik Komputer", "Pendidikan Teknik Informatika dan Komputer",
+  // FIKK
+  "Pendidikan Jasmani, Kesehatan dan Rekreasi", "Pendidikan Kepelatihan Olahraga", "Ilmu Keolahragaan", "Gizi", "Kesehatan Masyarakat",
+  // FEB
+  "Pendidikan Ekonomi (Pendidikan Akuntansi)", "Pendidikan Ekonomi (Pendidikan Koperasi)", "Pendidikan Ekonomi (Pendidikan Administrasi Perkantoran)", "Akuntansi", "Manajemen", "Ekonomi Pembangunan",
+  // FH
+  "Ilmu Hukum",
+  // FK
+  "Kedokteran"
+].sort();
 
-function App() {
-  const [studentData, setStudentData] = useState<StudentData>({
-    nim: '',
-    universityName: '',
-    fullName: '',
-    alamat: '',
-    major: '',
-    dob: '',
-    validThru: '',
-    email: '',
-    universityLogo: null,
-    studentPhoto: null,
-    stamp: null,
-    signature: null,
-  });
 
-  useEffect(() => {
-    const fontUrl = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&family=Oswald:wght@700&family=Montserrat:wght@400;700;900&display=swap';
-    
-    fetch(fontUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+// --- Helper Components defined outside App to prevent re-creation on re-render ---
+
+interface TextInputProps {
+  label: string;
+  name: keyof StudentData;
+  value: string;
+  placeholder: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const TextInput: React.FC<TextInputProps> = ({ label, name, value, placeholder, onChange }) => (
+  <div className="mb-4">
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    <input
+      type="text"
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+    />
+  </div>
+);
+
+interface SelectInputProps {
+  label: string;
+  name: keyof StudentData;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: string[];
+}
+
+const SelectInput: React.FC<SelectInputProps> = ({ label, name, value, onChange, options }) => (
+  <div className="mb-4">
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    <select
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white"
+    >
+      {options.map(option => (
+        <option key={option} value={option}>{option}</option>
+      ))}
+    </select>
+  </div>
+);
+
+
+const UploadIcon: React.FC<{className?: string}> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6 text-gray-400 mr-2"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+    </svg>
+);
+
+interface FileUploadProps {
+  label: string;
+  name: keyof StudentData;
+  onChange: (name: keyof StudentData, file: File | null) => void;
+  previewUrl: string | null;
+}
+
+const FileUpload: React.FC<FileUploadProps> = ({ label, name, onChange, previewUrl }) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            onChange(name, e.target.files[0]);
         }
-        return response.text();
-      })
-      .then(cssText => {
-        const style = document.createElement('style');
-        style.id = 'google-fonts-inline';
-        style.textContent = cssText;
-        document.head.appendChild(style);
-      })
-      .catch(error => {
-        console.error('Failed to fetch and inline Google Fonts:', error);
-      });
-
-    return () => {
-      const styleElement = document.getElementById('google-fonts-inline');
-      if (styleElement) {
-        styleElement.remove();
-      }
     };
+
+    return (
+        <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+            <div className="mt-1 flex items-center">
+                {previewUrl ? (
+                    <img src={previewUrl} alt="Preview" className="h-16 w-16 object-cover rounded-md bg-gray-200" />
+                ) : (
+                    <div className="h-16 w-16 bg-gray-200 rounded-md flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+                        </svg>
+                    </div>
+                )}
+                <label htmlFor={name} className="ml-4 cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                    <UploadIcon className="h-5 w-5 inline-block mr-1" />
+                    Pilih File
+                    <input id={name} name={name} type="file" className="sr-only" onChange={handleFileChange} accept="image/png, image/jpeg, image/svg+xml" />
+                </label>
+            </div>
+        </div>
+    );
+};
+
+
+const App: React.FC = () => {
+  const [data, setData] = useState<StudentData>(initialData);
+
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setData(prev => ({ ...prev, [name]: value }));
+  }, []);
+  
+  const handleSelectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setData(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setStudentData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageUpload = (field: keyof StudentData, base64: string) => {
-    setStudentData(prev => ({ ...prev, [field]: base64 }));
-  };
-  
-  const formatDateID = (dateString: string): string => {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    // If date is invalid (e.g., user is typing), return original string
-    if (isNaN(date.getTime())) return dateString;
-    
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    
-    // Use UTC methods to prevent timezone issues from shifting the date
-    // when parsing YYYY-MM-DD strings.
-    const day = date.getUTCDate();
-    const month = months[date.getUTCMonth()];
-    const year = date.getUTCFullYear();
-    
-    return `${day} ${month} ${year}`;
-  };
-
-  const formattedStudentData = {
-    ...studentData,
-    dob: formatDateID(studentData.dob),
-    validThru: formatDateID(studentData.validThru),
-  };
-
-  const templates = [
-    { title: 'Desain Modern (Indigo)', component: Template1 },
-    { title: 'Desain Dinamis (Indigo)', component: Template4 },
-  ];
+  const handleFileChange = useCallback((name: keyof StudentData, file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setData(prev => ({ ...prev, [name]: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-screen-2xl mx-auto">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800">ID Card Mahasiswa Generator</h1>
-          <p className="text-gray-600 mt-2">Isi form di bawah untuk membuat kartu ID Anda.</p>
-        </header>
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <header className="bg-white shadow-md">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <h1 className="text-3xl font-bold text-center text-gray-900">
+                  Generator Kartu Tanda Mahasiswa
+              </h1>
+              <p className="text-center text-gray-600 mt-1">Universitas Negeri Semarang</p>
+          </div>
+      </header>
 
-        <main className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Form Section */}
-          <section aria-labelledby="form-heading" className="lg:sticky lg:top-8">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
-              <h2 id="form-heading" className="text-2xl font-semibold text-gray-800 mb-6">Input Data</h2>
-              <div className="space-y-4">
-                <FormField label="NIM" id="nim" name="nim" value={studentData.nim} onChange={handleInputChange} placeholder="e.g., 1122334455" />
-                <FormField label="Nama Universitas" id="universityName" name="universityName" value={studentData.universityName} onChange={handleInputChange} placeholder="e.g., Universitas Indonesia" listId="universities-list" options={UNIVERSITIES_LIST} />
-                <FormField label="Nama Lengkap" id="fullName" name="fullName" value={studentData.fullName} onChange={handleInputChange} placeholder="e.g., Budi Hartono" />
-                <FormField label="Alamat" id="alamat" name="alamat" value={studentData.alamat} onChange={handleInputChange} placeholder="e.g., Jl. Merdeka No. 10" />
-                <FormField label="Jurusan" id="major" name="major" value={studentData.major} onChange={handleInputChange} placeholder="e.g., Ilmu Komputer" listId="majors-list" options={MAJORS_LIST} />
-                <FormField label="Tanggal Lahir" id="dob" name="dob" value={studentData.dob} onChange={handleInputChange} type="text" placeholder="e.g., 17 Agustus 2002" />
-                <FormField label="Berlaku Sampai" id="validThru" name="validThru" value={studentData.validThru} onChange={handleInputChange} type="text" placeholder="e.g., 17 Agustus 2026" />
-                <FormField label="Email" id="email" name="email" value={studentData.email} onChange={handleInputChange} type="email" placeholder="e.g., budi@ui.ac.id" />
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col lg:flex-row gap-8">
 
-                <hr className="my-6" />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <ImageUpload label="Upload Logo Universitas" id="universityLogo" onImageUpload={(base64) => handleImageUpload('universityLogo', base64)} uploadedImage={studentData.universityLogo} />
-                  <ImageUpload label="Upload Foto Mahasiswa" id="studentPhoto" onImageUpload={(base64) => handleImageUpload('studentPhoto', base64)} uploadedImage={studentData.studentPhoto} />
-                  <ImageUpload label="Upload Stempel" id="stamp" onImageUpload={(base64) => handleImageUpload('stamp', base64)} uploadedImage={studentData.stamp} />
-                  <ImageUpload label="Upload Tanda Tangan" id="signature" onImageUpload={(base64) => handleImageUpload('signature', base64)} uploadedImage={studentData.signature} />
-                </div>
-              </div>
+          {/* Control Panel */}
+          <div className="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Panel Kontrol</h2>
+            <div className="space-y-4">
+              <TextInput label="Nama Lengkap" name="nama" value={data.nama} onChange={handleTextChange} placeholder="Masukkan nama lengkap" />
+              <TextInput label="NIM" name="nim" value={data.nim} onChange={handleTextChange} placeholder="Masukkan NIM" />
+              <TextInput label="Berlaku Sampai" name="masaBerlaku" value={data.masaBerlaku} onChange={handleTextChange} placeholder="Contoh: 31 DES 2025" />
+              <SelectInput label="Program Studi" name="prodi" value={data.prodi} onChange={handleSelectChange} options={programStudiOptions} />
+              <TextInput label="Tempat Lahir" name="tempatLahir" value={data.tempatLahir} onChange={handleTextChange} placeholder="Masukkan tempat lahir" />
+              <TextInput label="Tanggal Lahir" name="tanggalLahir" value={data.tanggalLahir} onChange={handleTextChange} placeholder="Contoh: 3 September 1995" />
+              <TextInput label="Alamat Baris 1" name="alamat1" value={data.alamat1} onChange={handleTextChange} placeholder="Masukkan alamat baris 1" />
+              <TextInput label="Alamat Baris 2" name="alamat2" value={data.alamat2} onChange={handleTextChange} placeholder="Masukkan alamat baris 2" />
+              <TextInput label="Golongan Darah" name="golDarah" value={data.golDarah} onChange={handleTextChange} placeholder="Contoh: B" />
+              <TextInput label="Nomor Telepon" name="phone" value={data.phone} onChange={handleTextChange} placeholder="Contoh: 081234567890" />
+              <TextInput label="Email" name="email" value={data.email} onChange={handleTextChange} placeholder="Contoh: nama@email.com" />
+              
+              <FileUpload label="Logo Universitas (.png, .svg)" name="logo" onChange={handleFileChange} previewUrl={data.logo} />
+              <FileUpload label="Foto Mahasiswa (resmi)" name="foto" onChange={handleFileChange} previewUrl={data.foto} />
             </div>
-          </section>
+          </div>
 
-          {/* Card Preview Section */}
-          <section aria-labelledby="preview-heading">
-            <h2 id="preview-heading" className="text-2xl font-semibold text-gray-800 mb-6 text-center lg:text-left">Pratinjau & Download Kartu</h2>
-            <div className="grid grid-cols-1 gap-8 place-items-center">
-              {templates.map((template) => (
-                <IdCardPreview key={template.title} title={template.title}>
-                  <template.component data={formattedStudentData} />
-                </IdCardPreview>
-              ))}
+          {/* Preview Area */}
+          <div className="w-full lg:w-2/3">
+            <h2 className="text-2xl font-semibold mb-6 text-center lg:text-left">Pratinjau Desain Kartu</h2>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <CardTemplate design={1} data={data} />
+              <CardTemplate design={2} data={data} />
             </div>
-          </section>
-        </main>
-      </div>
+          </div>
+        </div>
+      </main>
+      
+      <footer className="text-center py-6 text-gray-500 text-sm">
+        Dibuat dengan ❤️ untuk Universitas Negeri Semarang.
+      </footer>
     </div>
   );
-}
+};
 
 export default App;

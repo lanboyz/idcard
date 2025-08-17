@@ -1,5 +1,5 @@
 {
-  "name": "id-card-mahasiswa-generator",
+  "name": "generator-kartu-tanda-mahasiswa-unnes",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react-dom": "^19.1.1",
     "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "html-to-image": "^1.11.11"
   },
   "devDependencies": {
