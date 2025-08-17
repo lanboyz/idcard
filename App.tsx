@@ -6,7 +6,6 @@ import ImageUpload from './components/ImageUpload';
 import IdCardPreview from './components/IdCardPreview';
 import Template1 from './components/templates/Template1';
 import Template4 from './components/templates/Template4';
-import Template6 from './components/templates/Template6';
 
 const MAJORS_LIST = [
   'Agribisnis',
@@ -213,7 +212,6 @@ function App() {
   const templates = [
     { title: 'Desain Modern (Indigo)', component: Template1 },
     { title: 'Desain Dinamis (Indigo)', component: Template4 },
-    { title: 'Desain Panel Kiri (Indigo)', component: Template6 },
   ];
 
   return (
@@ -224,10 +222,10 @@ function App() {
           <p className="text-gray-600 mt-2">Isi form di bawah untuk membuat kartu ID Anda.</p>
         </header>
 
-        <div className="space-y-12">
+        <main className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Form Section */}
-          <section aria-labelledby="form-heading">
-            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg max-w-5xl mx-auto">
+          <section aria-labelledby="form-heading" className="lg:sticky lg:top-8">
+            <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
               <h2 id="form-heading" className="text-2xl font-semibold text-gray-800 mb-6">Input Data</h2>
               <div className="space-y-4">
                 <FormField label="NIM" id="nim" name="nim" value={studentData.nim} onChange={handleInputChange} placeholder="e.g., 1122334455" />
@@ -253,8 +251,8 @@ function App() {
 
           {/* Card Preview Section */}
           <section aria-labelledby="preview-heading">
-            <h2 id="preview-heading" className="text-2xl font-semibold text-gray-800 mb-6 text-center">Pratinjau & Download Kartu</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 place-items-center">
+            <h2 id="preview-heading" className="text-2xl font-semibold text-gray-800 mb-6 text-center lg:text-left">Pratinjau & Download Kartu</h2>
+            <div className="grid grid-cols-1 gap-8 place-items-center">
               {templates.map((template) => (
                 <IdCardPreview key={template.title} title={template.title}>
                   <template.component data={formattedStudentData} />
@@ -262,7 +260,7 @@ function App() {
               ))}
             </div>
           </section>
-        </div>
+        </main>
       </div>
     </div>
   );
