@@ -10,7 +10,7 @@ const Template1 = forwardRef<HTMLDivElement, IdCardProps>(({ data }, ref) => {
   const { nim, universityName, fullName, alamat, major, dob, validThru, email, universityLogo, studentPhoto, stamp, signature } = data;
 
   return (
-    <div ref={ref} className="w-[3.375in] h-[2.125in] bg-white rounded-xl shadow-2xl flex flex-col font-sans overflow-hidden">
+    <div ref={ref} className="w-full h-full bg-white rounded-xl shadow-2xl flex flex-col font-sans overflow-hidden">
       {/* Header */}
       <div className="flex items-center p-3 bg-indigo-800 text-white rounded-t-xl">
         {universityLogo ? (
@@ -47,10 +47,10 @@ const Template1 = forwardRef<HTMLDivElement, IdCardProps>(({ data }, ref) => {
             <span className="col-span-2 font-mono">: {nim || '1234567890'}</span>
 
             <span className="font-semibold text-gray-500">Tgl. Lahir</span>
-            <span className="col-span-2 font-mono">: {dob || 'YYYY-MM-DD'}</span>
+            <span className="col-span-2 font-mono">: {dob || '17 Agustus 2002'}</span>
             
             <span className="font-semibold text-gray-500">Berlaku s/d</span>
-            <span className="col-span-2 font-mono">: {validThru || 'YYYY-MM-DD'}</span>
+            <span className="col-span-2 font-mono">: {validThru || '17 Agustus 2026'}</span>
 
             <span className="font-semibold text-gray-500">Email</span>
             <span className="col-span-2 font-mono truncate">: {email || 'email@student.ac.id'}</span>
